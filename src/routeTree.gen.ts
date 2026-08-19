@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CareTeamRouteImport } from './routes/care-team'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as GuidanceRouteImport } from './routes/guidance'
 import { Route as MedicationsRouteImport } from './routes/medications'
+import { Route as PrepRouteImport } from './routes/prep'
 import { Route as SymptomsRouteImport } from './routes/symptoms'
 import { Route as TriageRouteImport } from './routes/triage'
 import { Route as WellbeingRouteImport } from './routes/wellbeing'
@@ -26,6 +28,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareTeamRoute = CareTeamRouteImport.update({
+  id: '/care-team',
+  path: '/care-team',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunityRoute = CommunityRouteImport.update({
@@ -41,6 +48,11 @@ const GuidanceRoute = GuidanceRouteImport.update({
 const MedicationsRoute = MedicationsRouteImport.update({
   id: '/medications',
   path: '/medications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrepRoute = PrepRouteImport.update({
+  id: '/prep',
+  path: '/prep',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SymptomsRoute = SymptomsRouteImport.update({
@@ -62,9 +74,11 @@ const WellbeingRoute = WellbeingRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/care-team': typeof CareTeamRoute
   '/community': typeof CommunityRoute
   '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
+  '/prep': typeof PrepRoute
   '/symptoms': typeof SymptomsRoute
   '/triage': typeof TriageRoute
   '/wellbeing': typeof WellbeingRoute
@@ -72,9 +86,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/care-team': typeof CareTeamRoute
   '/community': typeof CommunityRoute
   '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
+  '/prep': typeof PrepRoute
   '/symptoms': typeof SymptomsRoute
   '/triage': typeof TriageRoute
   '/wellbeing': typeof WellbeingRoute
@@ -83,9 +99,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/care-team': typeof CareTeamRoute
   '/community': typeof CommunityRoute
   '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
+  '/prep': typeof PrepRoute
   '/symptoms': typeof SymptomsRoute
   '/triage': typeof TriageRoute
   '/wellbeing': typeof WellbeingRoute
@@ -95,9 +113,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/care-team'
     | '/community'
     | '/guidance'
     | '/medications'
+    | '/prep'
     | '/symptoms'
     | '/triage'
     | '/wellbeing'
@@ -105,9 +125,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/care-team'
     | '/community'
     | '/guidance'
     | '/medications'
+    | '/prep'
     | '/symptoms'
     | '/triage'
     | '/wellbeing'
@@ -115,9 +137,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
+    | '/care-team'
     | '/community'
     | '/guidance'
     | '/medications'
+    | '/prep'
     | '/symptoms'
     | '/triage'
     | '/wellbeing'
@@ -126,9 +150,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  CareTeamRoute: typeof CareTeamRoute
   CommunityRoute: typeof CommunityRoute
   GuidanceRoute: typeof GuidanceRoute
   MedicationsRoute: typeof MedicationsRoute
+  PrepRoute: typeof PrepRoute
   SymptomsRoute: typeof SymptomsRoute
   TriageRoute: typeof TriageRoute
   WellbeingRoute: typeof WellbeingRoute
@@ -150,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/care-team': {
+      id: '/care-team'
+      path: '/care-team'
+      fullPath: '/care-team'
+      preLoaderRoute: typeof CareTeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/community': {
       id: '/community'
       path: '/community'
@@ -169,6 +202,13 @@ declare module '@tanstack/react-router' {
       path: '/medications'
       fullPath: '/medications'
       preLoaderRoute: typeof MedicationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prep': {
+      id: '/prep'
+      path: '/prep'
+      fullPath: '/prep'
+      preLoaderRoute: typeof PrepRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/symptoms': {
@@ -198,9 +238,11 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  CareTeamRoute: CareTeamRoute,
   CommunityRoute: CommunityRoute,
   GuidanceRoute: GuidanceRoute,
   MedicationsRoute: MedicationsRoute,
+  PrepRoute: PrepRoute,
   SymptomsRoute: SymptomsRoute,
   TriageRoute: TriageRoute,
   WellbeingRoute: WellbeingRoute,
