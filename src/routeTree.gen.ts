@@ -16,6 +16,7 @@ import { Route as CommunityRouteImport } from './routes/community'
 import { Route as GuidanceRouteImport } from './routes/guidance'
 import { Route as MedicationsRouteImport } from './routes/medications'
 import { Route as PrepRouteImport } from './routes/prep'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SymptomsRouteImport } from './routes/symptoms'
 import { Route as TriageRouteImport } from './routes/triage'
 import { Route as WellbeingRouteImport } from './routes/wellbeing'
@@ -55,6 +56,11 @@ const PrepRoute = PrepRouteImport.update({
   path: '/prep',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SymptomsRoute = SymptomsRouteImport.update({
   id: '/symptoms',
   path: '/symptoms',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
   '/prep': typeof PrepRoute
+  '/profile': typeof ProfileRoute
   '/symptoms': typeof SymptomsRoute
   '/triage': typeof TriageRoute
   '/wellbeing': typeof WellbeingRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
   '/prep': typeof PrepRoute
+  '/profile': typeof ProfileRoute
   '/symptoms': typeof SymptomsRoute
   '/triage': typeof TriageRoute
   '/wellbeing': typeof WellbeingRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
   '/prep': typeof PrepRoute
+  '/profile': typeof ProfileRoute
   '/symptoms': typeof SymptomsRoute
   '/triage': typeof TriageRoute
   '/wellbeing': typeof WellbeingRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/guidance'
     | '/medications'
     | '/prep'
+    | '/profile'
     | '/symptoms'
     | '/triage'
     | '/wellbeing'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/guidance'
     | '/medications'
     | '/prep'
+    | '/profile'
     | '/symptoms'
     | '/triage'
     | '/wellbeing'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/guidance'
     | '/medications'
     | '/prep'
+    | '/profile'
     | '/symptoms'
     | '/triage'
     | '/wellbeing'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   GuidanceRoute: typeof GuidanceRoute
   MedicationsRoute: typeof MedicationsRoute
   PrepRoute: typeof PrepRoute
+  ProfileRoute: typeof ProfileRoute
   SymptomsRoute: typeof SymptomsRoute
   TriageRoute: typeof TriageRoute
   WellbeingRoute: typeof WellbeingRoute
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrepRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/symptoms': {
       id: '/symptoms'
       path: '/symptoms'
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   GuidanceRoute: GuidanceRoute,
   MedicationsRoute: MedicationsRoute,
   PrepRoute: PrepRoute,
+  ProfileRoute: ProfileRoute,
   SymptomsRoute: SymptomsRoute,
   TriageRoute: TriageRoute,
   WellbeingRoute: WellbeingRoute,
