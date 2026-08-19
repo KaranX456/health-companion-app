@@ -10,33 +10,167 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CareTeamRouteImport } from './routes/care-team'
+import { Route as CommunityRouteImport } from './routes/community'
+import { Route as GuidanceRouteImport } from './routes/guidance'
+import { Route as MedicationsRouteImport } from './routes/medications'
+import { Route as PrepRouteImport } from './routes/prep'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as SymptomsRouteImport } from './routes/symptoms'
+import { Route as TriageRouteImport } from './routes/triage'
+import { Route as WellbeingRouteImport } from './routes/wellbeing'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareTeamRoute = CareTeamRouteImport.update({
+  id: '/care-team',
+  path: '/care-team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidanceRoute = GuidanceRouteImport.update({
+  id: '/guidance',
+  path: '/guidance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MedicationsRoute = MedicationsRouteImport.update({
+  id: '/medications',
+  path: '/medications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrepRoute = PrepRouteImport.update({
+  id: '/prep',
+  path: '/prep',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SymptomsRoute = SymptomsRouteImport.update({
+  id: '/symptoms',
+  path: '/symptoms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TriageRoute = TriageRouteImport.update({
+  id: '/triage',
+  path: '/triage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WellbeingRoute = WellbeingRouteImport.update({
+  id: '/wellbeing',
+  path: '/wellbeing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/care-team': typeof CareTeamRoute
+  '/community': typeof CommunityRoute
+  '/guidance': typeof GuidanceRoute
+  '/medications': typeof MedicationsRoute
+  '/prep': typeof PrepRoute
+  '/profile': typeof ProfileRoute
+  '/symptoms': typeof SymptomsRoute
+  '/triage': typeof TriageRoute
+  '/wellbeing': typeof WellbeingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/care-team': typeof CareTeamRoute
+  '/community': typeof CommunityRoute
+  '/guidance': typeof GuidanceRoute
+  '/medications': typeof MedicationsRoute
+  '/prep': typeof PrepRoute
+  '/profile': typeof ProfileRoute
+  '/symptoms': typeof SymptomsRoute
+  '/triage': typeof TriageRoute
+  '/wellbeing': typeof WellbeingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/care-team': typeof CareTeamRoute
+  '/community': typeof CommunityRoute
+  '/guidance': typeof GuidanceRoute
+  '/medications': typeof MedicationsRoute
+  '/prep': typeof PrepRoute
+  '/profile': typeof ProfileRoute
+  '/symptoms': typeof SymptomsRoute
+  '/triage': typeof TriageRoute
+  '/wellbeing': typeof WellbeingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/care-team'
+    | '/community'
+    | '/guidance'
+    | '/medications'
+    | '/prep'
+    | '/profile'
+    | '/symptoms'
+    | '/triage'
+    | '/wellbeing'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/care-team'
+    | '/community'
+    | '/guidance'
+    | '/medications'
+    | '/prep'
+    | '/profile'
+    | '/symptoms'
+    | '/triage'
+    | '/wellbeing'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/care-team'
+    | '/community'
+    | '/guidance'
+    | '/medications'
+    | '/prep'
+    | '/profile'
+    | '/symptoms'
+    | '/triage'
+    | '/wellbeing'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
+  CareTeamRoute: typeof CareTeamRoute
+  CommunityRoute: typeof CommunityRoute
+  GuidanceRoute: typeof GuidanceRoute
+  MedicationsRoute: typeof MedicationsRoute
+  PrepRoute: typeof PrepRoute
+  ProfileRoute: typeof ProfileRoute
+  SymptomsRoute: typeof SymptomsRoute
+  TriageRoute: typeof TriageRoute
+  WellbeingRoute: typeof WellbeingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +182,91 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/care-team': {
+      id: '/care-team'
+      path: '/care-team'
+      fullPath: '/care-team'
+      preLoaderRoute: typeof CareTeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guidance': {
+      id: '/guidance'
+      path: '/guidance'
+      fullPath: '/guidance'
+      preLoaderRoute: typeof GuidanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/medications': {
+      id: '/medications'
+      path: '/medications'
+      fullPath: '/medications'
+      preLoaderRoute: typeof MedicationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prep': {
+      id: '/prep'
+      path: '/prep'
+      fullPath: '/prep'
+      preLoaderRoute: typeof PrepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/symptoms': {
+      id: '/symptoms'
+      path: '/symptoms'
+      fullPath: '/symptoms'
+      preLoaderRoute: typeof SymptomsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/triage': {
+      id: '/triage'
+      path: '/triage'
+      fullPath: '/triage'
+      preLoaderRoute: typeof TriageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wellbeing': {
+      id: '/wellbeing'
+      path: '/wellbeing'
+      fullPath: '/wellbeing'
+      preLoaderRoute: typeof WellbeingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
+  CareTeamRoute: CareTeamRoute,
+  CommunityRoute: CommunityRoute,
+  GuidanceRoute: GuidanceRoute,
+  MedicationsRoute: MedicationsRoute,
+  PrepRoute: PrepRoute,
+  ProfileRoute: ProfileRoute,
+  SymptomsRoute: SymptomsRoute,
+  TriageRoute: TriageRoute,
+  WellbeingRoute: WellbeingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
