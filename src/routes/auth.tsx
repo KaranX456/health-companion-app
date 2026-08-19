@@ -35,7 +35,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string; fullName?: string }>({});
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -44,7 +44,7 @@ function AuthPage() {
   }, [loading, user, navigate]);
 
   function validate() {
-    const next: Record<string, string> = {};
+    const next: { email?: string; password?: string; fullName?: string } = {};
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) next.email = "Enter a valid email address.";
     if (password.length < 6) next.password = "Password must be at least 6 characters.";
     if (mode === "signup" && fullName.trim().length < 2) next.fullName = "Please enter your full name.";
@@ -64,7 +64,6 @@ function AuthPage() {
           password,
           options: {
             data: { role: "patient", full_name: fullName.trim() },
-            emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
           },
         });
         if (error) throw error;
