@@ -11,10 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CommunityRouteImport } from './routes/community'
 import { Route as GuidanceRouteImport } from './routes/guidance'
 import { Route as MedicationsRouteImport } from './routes/medications'
 import { Route as SymptomsRouteImport } from './routes/symptoms'
 import { Route as TriageRouteImport } from './routes/triage'
+import { Route as WellbeingRouteImport } from './routes/wellbeing'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -24,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuidanceRoute = GuidanceRouteImport.update({
@@ -46,55 +53,85 @@ const TriageRoute = TriageRouteImport.update({
   path: '/triage',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WellbeingRoute = WellbeingRouteImport.update({
+  id: '/wellbeing',
+  path: '/wellbeing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/community': typeof CommunityRoute
   '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
   '/symptoms': typeof SymptomsRoute
   '/triage': typeof TriageRoute
+  '/wellbeing': typeof WellbeingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/community': typeof CommunityRoute
   '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
   '/symptoms': typeof SymptomsRoute
   '/triage': typeof TriageRoute
+  '/wellbeing': typeof WellbeingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/community': typeof CommunityRoute
   '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
   '/symptoms': typeof SymptomsRoute
   '/triage': typeof TriageRoute
+  '/wellbeing': typeof WellbeingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/guidance' | '/medications' | '/symptoms' | '/triage'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/guidance' | '/medications' | '/symptoms' | '/triage'
-  id:
-    | '__root__'
     | '/'
     | '/auth'
+    | '/community'
     | '/guidance'
     | '/medications'
     | '/symptoms'
     | '/triage'
+    | '/wellbeing'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/auth'
+    | '/community'
+    | '/guidance'
+    | '/medications'
+    | '/symptoms'
+    | '/triage'
+    | '/wellbeing'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/community'
+    | '/guidance'
+    | '/medications'
+    | '/symptoms'
+    | '/triage'
+    | '/wellbeing'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  CommunityRoute: typeof CommunityRoute
   GuidanceRoute: typeof GuidanceRoute
   MedicationsRoute: typeof MedicationsRoute
   SymptomsRoute: typeof SymptomsRoute
   TriageRoute: typeof TriageRoute
+  WellbeingRoute: typeof WellbeingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -111,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/guidance': {
@@ -141,16 +185,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TriageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wellbeing': {
+      id: '/wellbeing'
+      path: '/wellbeing'
+      fullPath: '/wellbeing'
+      preLoaderRoute: typeof WellbeingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  CommunityRoute: CommunityRoute,
   GuidanceRoute: GuidanceRoute,
   MedicationsRoute: MedicationsRoute,
   SymptomsRoute: SymptomsRoute,
   TriageRoute: TriageRoute,
+  WellbeingRoute: WellbeingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
