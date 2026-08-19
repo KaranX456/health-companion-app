@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as GuidanceRouteImport } from './routes/guidance'
 import { Route as MedicationsRouteImport } from './routes/medications'
 import { Route as SymptomsRouteImport } from './routes/symptoms'
+import { Route as TriageRouteImport } from './routes/triage'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidanceRoute = GuidanceRouteImport.update({
+  id: '/guidance',
+  path: '/guidance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MedicationsRoute = MedicationsRouteImport.update({
@@ -34,39 +41,60 @@ const SymptomsRoute = SymptomsRouteImport.update({
   path: '/symptoms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TriageRoute = TriageRouteImport.update({
+  id: '/triage',
+  path: '/triage',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
   '/symptoms': typeof SymptomsRoute
+  '/triage': typeof TriageRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
   '/symptoms': typeof SymptomsRoute
+  '/triage': typeof TriageRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
   '/symptoms': typeof SymptomsRoute
+  '/triage': typeof TriageRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/medications' | '/symptoms'
+  fullPaths:
+    '/' | '/auth' | '/guidance' | '/medications' | '/symptoms' | '/triage'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/medications' | '/symptoms'
-  id: '__root__' | '/' | '/auth' | '/medications' | '/symptoms'
+  to: '/' | '/auth' | '/guidance' | '/medications' | '/symptoms' | '/triage'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/guidance'
+    | '/medications'
+    | '/symptoms'
+    | '/triage'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  GuidanceRoute: typeof GuidanceRoute
   MedicationsRoute: typeof MedicationsRoute
   SymptomsRoute: typeof SymptomsRoute
+  TriageRoute: typeof TriageRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,6 +113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guidance': {
+      id: '/guidance'
+      path: '/guidance'
+      fullPath: '/guidance'
+      preLoaderRoute: typeof GuidanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/medications': {
       id: '/medications'
       path: '/medications'
@@ -99,14 +134,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SymptomsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/triage': {
+      id: '/triage'
+      path: '/triage'
+      fullPath: '/triage'
+      preLoaderRoute: typeof TriageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  GuidanceRoute: GuidanceRoute,
   MedicationsRoute: MedicationsRoute,
   SymptomsRoute: SymptomsRoute,
+  TriageRoute: TriageRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
