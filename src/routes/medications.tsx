@@ -13,8 +13,29 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { EmptyState, ListSkeleton } from "@/components/common";
 import { formatDate, today } from "@/lib/format";
+
+type MedicationReminder = {
+  id: string;
+  medication_id: string;
+  patient_id: string;
+  time_of_day: string;
+  label: string | null;
+  active: boolean;
+  created_at?: string | null;
+};
+
+function formatTimeOfDay(value: string) {
+  const [h, m] = value.split(":");
+  const hour = Number(h);
+  if (Number.isNaN(hour)) return value;
+  const suffix = hour >= 12 ? "PM" : "AM";
+  const display = hour % 12 === 0 ? 12 : hour % 12;
+  return `${display}:${m ?? "00"} ${suffix}`;
+}
+
 
 export const Route = createFileRoute("/medications")({
   ssr: false,
@@ -60,6 +81,8 @@ function MedicationsPage() {
   const [adherence, setAdherence] = useState<Record<string, boolean>>({});
   const [sideEffectMed, setSideEffectMed] = useState("");
   const [sideEffect, setSideEffect] = useState("");
+  const [reminderDrafts, setReminderDrafts] = useState<Record<string, { time: string; label: string }>>({});
+
 
   const medsQ = useQuery({
     enabled: !!uid,
@@ -140,7 +163,79 @@ function MedicationsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const remindersQ = useQuery({
+    enabled: !!uid,
+    queryKey: ["medication_reminders", uid],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("medication_reminders")
+        .select("*")
+        .eq("patient_id", uid!)
+        .order("time_of_day", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as MedicationReminder[];
+    },
+  });
+
+  const invalidateReminders = () =>
+    void qc.invalidateQueries({ queryKey: ["medication_reminders", uid] });
+
+  const addReminder = useMutation({
+    mutationFn: async (vars: { medicationId: string; time: string; label: string }) => {
+      const { error } = await supabase.from("medication_reminders").insert({
+        patient_id: uid!,
+        medication_id: vars.medicationId,
+        time_of_day: vars.time.length === 5 ? `${vars.time}:00` : vars.time,
+        label: vars.label.trim() || null,
+        active: true,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      toast.success("Reminder added");
+      setReminderDrafts((prev) => ({ ...prev, [vars.medicationId]: { time: "", label: "" } }));
+      invalidateReminders();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const toggleReminder = useMutation({
+    mutationFn: async (r: MedicationReminder) => {
+      const { error } = await supabase
+        .from("medication_reminders")
+        .update({ active: !r.active })
+        .eq("id", r.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Reminder updated");
+      invalidateReminders();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteReminder = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("medication_reminders").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Reminder deleted");
+      invalidateReminders();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const activeMeds = (medsQ.data ?? []).filter((m) => m.active);
+
+  const remindersByMed = (remindersQ.data ?? []).reduce<Record<string, MedicationReminder[]>>(
+    (acc, r) => {
+      (acc[r.medication_id] ??= []).push(r);
+      return acc;
+    },
+    {},
+  );
+
 
   return (
     <AppLayout title="Medication companion" description="Keep your medication list accurate and current.">
