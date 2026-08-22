@@ -13,8 +13,29 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { EmptyState, ListSkeleton } from "@/components/common";
 import { formatDate, today } from "@/lib/format";
+
+type MedicationReminder = {
+  id: string;
+  medication_id: string;
+  patient_id: string;
+  time_of_day: string;
+  label: string | null;
+  active: boolean;
+  created_at?: string | null;
+};
+
+function formatTimeOfDay(value: string) {
+  const [h, m] = value.split(":");
+  const hour = Number(h);
+  if (Number.isNaN(hour)) return value;
+  const suffix = hour >= 12 ? "PM" : "AM";
+  const display = hour % 12 === 0 ? 12 : hour % 12;
+  return `${display}:${m ?? "00"} ${suffix}`;
+}
+
 
 export const Route = createFileRoute("/medications")({
   ssr: false,
