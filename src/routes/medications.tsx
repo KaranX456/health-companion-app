@@ -81,6 +81,8 @@ function MedicationsPage() {
   const [adherence, setAdherence] = useState<Record<string, boolean>>({});
   const [sideEffectMed, setSideEffectMed] = useState("");
   const [sideEffect, setSideEffect] = useState("");
+  const [reminderDrafts, setReminderDrafts] = useState<Record<string, { time: string; label: string }>>({});
+
 
   const medsQ = useQuery({
     enabled: !!uid,
