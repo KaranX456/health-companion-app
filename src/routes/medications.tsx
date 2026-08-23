@@ -498,6 +498,8 @@ function MedicationsPage() {
         </Card>
 
         <Card className="rounded-2xl lg:col-span-2">
+          <CardHeader>
+            <CardTitle>This week's adherence</CardTitle>
           </CardHeader>
           <CardContent>
             {activeMeds.length === 0 ? (
