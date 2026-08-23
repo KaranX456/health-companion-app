@@ -388,6 +388,117 @@ function MedicationsPage() {
 
         <Card className="rounded-2xl lg:col-span-2">
           <CardHeader>
+            <CardTitle>Medication reminders</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              We'll email you at each scheduled time asking if you've taken your dose — no need to log in
+              to confirm, just click Yes in the email.
+            </p>
+          </CardHeader>
+          <CardContent>
+            {activeMeds.length === 0 ? (
+              <EmptyState title="Add a medication above to set reminders" />
+            ) : (
+              <div className="space-y-5">
+                {activeMeds.map((m) => {
+                  const reminders = remindersByMed[m.id] ?? [];
+                  const draft = reminderDrafts[m.id] ?? { time: "", label: "" };
+                  return (
+                    <div key={m.id} className="rounded-2xl border border-border p-4">
+                      <div className="mb-3 flex items-center justify-between">
+                        <p className="font-medium">{m.drug_name}</p>
+                        <span className="text-xs font-medium text-muted-foreground">Reminders</span>
+                      </div>
+                      {reminders.length === 0 ? (
+                        <p className="mb-3 text-sm text-muted-foreground">No reminders yet for this medication.</p>
+                      ) : (
+                        <ul className="mb-3 space-y-2">
+                          {reminders.map((r) => (
+                            <li
+                              key={r.id}
+                              className="flex items-center justify-between rounded-xl border border-border px-3 py-2"
+                            >
+                              <div>
+                                <p className="text-sm font-medium">{formatTimeOfDay(r.time_of_day)}</p>
+                                {r.label ? <p className="text-xs text-muted-foreground">{r.label}</p> : null}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={r.active}
+                                  onCheckedChange={() => toggleReminder.mutate(r)}
+                                  aria-label={`Toggle reminder for ${m.drug_name} at ${formatTimeOfDay(r.time_of_day)}`}
+                                />
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="rounded-xl text-destructive"
+                                  onClick={() => deleteReminder.mutate(r.id)}
+                                  disabled={deleteReminder.isPending}
+                                >
+                                  Delete
+                                </Button>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      <form
+                        className="flex flex-col gap-3 sm:flex-row sm:items-end"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (!draft.time) {
+                            toast.error("Pick a time for the reminder.");
+                            return;
+                          }
+                          addReminder.mutate({ medicationId: m.id, time: draft.time, label: draft.label });
+                        }}
+                      >
+                        <div className="space-y-1.5 sm:w-40">
+                          <Label htmlFor={`time-${m.id}`}>Time</Label>
+                          <Input
+                            id={`time-${m.id}`}
+                            type="time"
+                            value={draft.time}
+                            onChange={(e) =>
+                              setReminderDrafts((prev) => ({
+                                ...prev,
+                                [m.id]: { ...draft, time: e.target.value },
+                              }))
+                            }
+                          />
+                        </div>
+                        <div className="space-y-1.5 flex-1">
+                          <Label htmlFor={`label-${m.id}`}>Label (optional)</Label>
+                          <Input
+                            id={`label-${m.id}`}
+                            value={draft.label}
+                            maxLength={80}
+                            placeholder="e.g., with breakfast"
+                            onChange={(e) =>
+                              setReminderDrafts((prev) => ({
+                                ...prev,
+                                [m.id]: { ...draft, label: e.target.value },
+                              }))
+                            }
+                          />
+                        </div>
+                        <Button
+                          type="submit"
+                          className="rounded-xl"
+                          disabled={addReminder.isPending || !draft.time}
+                        >
+                          Add reminder
+                        </Button>
+                      </form>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl lg:col-span-2">
+          <CardHeader>
             <CardTitle>This week's adherence</CardTitle>
           </CardHeader>
           <CardContent>
