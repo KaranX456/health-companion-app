@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CareTeamRouteImport } from './routes/care-team'
 import { Route as CommunityRouteImport } from './routes/community'
+import { Route as ConfirmMedicationRouteImport } from './routes/confirm-medication'
 import { Route as GuidanceRouteImport } from './routes/guidance'
 import { Route as MedicationsRouteImport } from './routes/medications'
 import { Route as PrepRouteImport } from './routes/prep'
@@ -39,6 +40,11 @@ const CareTeamRoute = CareTeamRouteImport.update({
 const CommunityRoute = CommunityRouteImport.update({
   id: '/community',
   path: '/community',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfirmMedicationRoute = ConfirmMedicationRouteImport.update({
+  id: '/confirm-medication',
+  path: '/confirm-medication',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuidanceRoute = GuidanceRouteImport.update({
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/care-team': typeof CareTeamRoute
   '/community': typeof CommunityRoute
+  '/confirm-medication': typeof ConfirmMedicationRoute
   '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
   '/prep': typeof PrepRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/care-team': typeof CareTeamRoute
   '/community': typeof CommunityRoute
+  '/confirm-medication': typeof ConfirmMedicationRoute
   '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
   '/prep': typeof PrepRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/care-team': typeof CareTeamRoute
   '/community': typeof CommunityRoute
+  '/confirm-medication': typeof ConfirmMedicationRoute
   '/guidance': typeof GuidanceRoute
   '/medications': typeof MedicationsRoute
   '/prep': typeof PrepRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/care-team'
     | '/community'
+    | '/confirm-medication'
     | '/guidance'
     | '/medications'
     | '/prep'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/care-team'
     | '/community'
+    | '/confirm-medication'
     | '/guidance'
     | '/medications'
     | '/prep'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/care-team'
     | '/community'
+    | '/confirm-medication'
     | '/guidance'
     | '/medications'
     | '/prep'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CareTeamRoute: typeof CareTeamRoute
   CommunityRoute: typeof CommunityRoute
+  ConfirmMedicationRoute: typeof ConfirmMedicationRoute
   GuidanceRoute: typeof GuidanceRoute
   MedicationsRoute: typeof MedicationsRoute
   PrepRoute: typeof PrepRoute
@@ -201,6 +214,13 @@ declare module '@tanstack/react-router' {
       path: '/community'
       fullPath: '/community'
       preLoaderRoute: typeof CommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confirm-medication': {
+      id: '/confirm-medication'
+      path: '/confirm-medication'
+      fullPath: '/confirm-medication'
+      preLoaderRoute: typeof ConfirmMedicationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/guidance': {
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CareTeamRoute: CareTeamRoute,
   CommunityRoute: CommunityRoute,
+  ConfirmMedicationRoute: ConfirmMedicationRoute,
   GuidanceRoute: GuidanceRoute,
   MedicationsRoute: MedicationsRoute,
   PrepRoute: PrepRoute,

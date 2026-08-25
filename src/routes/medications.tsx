@@ -12,10 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { Switch } from "@/components/ui/switch";
 import { EmptyState, ListSkeleton } from "@/components/common";
 import { formatDate, today } from "@/lib/format";
+
+type Recurrence = "daily" | "once";
 
 type MedicationReminder = {
   id: string;
@@ -24,8 +26,36 @@ type MedicationReminder = {
   time_of_day: string;
   label: string | null;
   active: boolean;
+  recurrence: Recurrence | null;
   created_at?: string | null;
 };
+
+type ReminderLog = {
+  id: string;
+  reminder_id: string;
+  medication_id: string;
+  patient_id: string;
+  scheduled_for: string;
+  confirmed_at: string | null;
+};
+
+function lastSevenDays() {
+  const days: { key: string; label: string }[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    days.push({
+      key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`,
+      label: d.toLocaleDateString(undefined, { weekday: "short" }),
+    });
+  }
+  return days;
+}
+
+function localDayKey(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 function formatTimeOfDay(value: string) {
   const [h, m] = value.split(":");
@@ -78,10 +108,11 @@ function MedicationsPage() {
 
   const [form, setForm] = useState<MedForm>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [adherence, setAdherence] = useState<Record<string, boolean>>({});
   const [sideEffectMed, setSideEffectMed] = useState("");
   const [sideEffect, setSideEffect] = useState("");
-  const [reminderDrafts, setReminderDrafts] = useState<Record<string, { time: string; label: string }>>({});
+  const [reminderDrafts, setReminderDrafts] = useState<
+    Record<string, { time: string; label: string; recurrence: Recurrence }>
+  >({});
 
 
   const medsQ = useQuery({
@@ -181,19 +212,28 @@ function MedicationsPage() {
     void qc.invalidateQueries({ queryKey: ["medication_reminders", uid] });
 
   const addReminder = useMutation({
-    mutationFn: async (vars: { medicationId: string; time: string; label: string }) => {
+    mutationFn: async (vars: {
+      medicationId: string;
+      time: string;
+      label: string;
+      recurrence: Recurrence;
+    }) => {
       const { error } = await supabase.from("medication_reminders").insert({
         patient_id: uid!,
         medication_id: vars.medicationId,
         time_of_day: vars.time.length === 5 ? `${vars.time}:00` : vars.time,
         label: vars.label.trim() || null,
+        recurrence: vars.recurrence,
         active: true,
       });
       if (error) throw error;
     },
     onSuccess: (_d, vars) => {
       toast.success("Reminder added");
-      setReminderDrafts((prev) => ({ ...prev, [vars.medicationId]: { time: "", label: "" } }));
+      setReminderDrafts((prev) => ({
+        ...prev,
+        [vars.medicationId]: { time: "", label: "", recurrence: "daily" },
+      }));
       invalidateReminders();
     },
     onError: (e: Error) => toast.error(e.message),
