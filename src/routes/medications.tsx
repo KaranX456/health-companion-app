@@ -83,7 +83,6 @@ export const Route = createFileRoute("/medications")({
   component: MedicationsPage,
 });
 
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 type MedForm = {
   drug_name: string;
