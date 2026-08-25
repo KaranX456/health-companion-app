@@ -12,10 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { Switch } from "@/components/ui/switch";
 import { EmptyState, ListSkeleton } from "@/components/common";
 import { formatDate, today } from "@/lib/format";
+
+type Recurrence = "daily" | "once";
 
 type MedicationReminder = {
   id: string;
@@ -24,8 +26,36 @@ type MedicationReminder = {
   time_of_day: string;
   label: string | null;
   active: boolean;
+  recurrence: Recurrence | null;
   created_at?: string | null;
 };
+
+type ReminderLog = {
+  id: string;
+  reminder_id: string;
+  medication_id: string;
+  patient_id: string;
+  scheduled_for: string;
+  confirmed_at: string | null;
+};
+
+function lastSevenDays() {
+  const days: { key: string; label: string }[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    days.push({
+      key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`,
+      label: d.toLocaleDateString(undefined, { weekday: "short" }),
+    });
+  }
+  return days;
+}
+
+function localDayKey(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 function formatTimeOfDay(value: string) {
   const [h, m] = value.split(":");
@@ -53,7 +83,6 @@ export const Route = createFileRoute("/medications")({
   component: MedicationsPage,
 });
 
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 type MedForm = {
   drug_name: string;
@@ -78,10 +107,11 @@ function MedicationsPage() {
 
   const [form, setForm] = useState<MedForm>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [adherence, setAdherence] = useState<Record<string, boolean>>({});
   const [sideEffectMed, setSideEffectMed] = useState("");
   const [sideEffect, setSideEffect] = useState("");
-  const [reminderDrafts, setReminderDrafts] = useState<Record<string, { time: string; label: string }>>({});
+  const [reminderDrafts, setReminderDrafts] = useState<
+    Record<string, { time: string; label: string; recurrence: Recurrence }>
+  >({});
 
 
   const medsQ = useQuery({
@@ -181,19 +211,28 @@ function MedicationsPage() {
     void qc.invalidateQueries({ queryKey: ["medication_reminders", uid] });
 
   const addReminder = useMutation({
-    mutationFn: async (vars: { medicationId: string; time: string; label: string }) => {
+    mutationFn: async (vars: {
+      medicationId: string;
+      time: string;
+      label: string;
+      recurrence: Recurrence;
+    }) => {
       const { error } = await supabase.from("medication_reminders").insert({
         patient_id: uid!,
         medication_id: vars.medicationId,
         time_of_day: vars.time.length === 5 ? `${vars.time}:00` : vars.time,
         label: vars.label.trim() || null,
+        recurrence: vars.recurrence,
         active: true,
       });
       if (error) throw error;
     },
     onSuccess: (_d, vars) => {
       toast.success("Reminder added");
-      setReminderDrafts((prev) => ({ ...prev, [vars.medicationId]: { time: "", label: "" } }));
+      setReminderDrafts((prev) => ({
+        ...prev,
+        [vars.medicationId]: { time: "", label: "", recurrence: "daily" },
+      }));
       invalidateReminders();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -235,6 +274,40 @@ function MedicationsPage() {
     },
     {},
   );
+
+  const days = lastSevenDays();
+
+  const logsQ = useQuery({
+    enabled: !!uid,
+    queryKey: ["medication_reminder_logs", uid],
+    queryFn: async () => {
+      const since = new Date();
+      since.setDate(since.getDate() - 7);
+      const { data, error } = await supabase
+        .from("medication_reminder_logs")
+        .select("*")
+        .eq("patient_id", uid!)
+        .gte("scheduled_for", since.toISOString())
+        .order("scheduled_for", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as ReminderLog[];
+    },
+  });
+
+  const medNameById = new Map((medsQ.data ?? []).map((m) => [m.id, m.drug_name]));
+
+  const adherenceRows = (remindersQ.data ?? [])
+    .filter((r) => medNameById.has(r.medication_id))
+    .map((r) => {
+      const byDay: Record<string, ReminderLog | undefined> = {};
+      for (const log of logsQ.data ?? []) {
+        if (log.reminder_id !== r.id) continue;
+        const key = localDayKey(log.scheduled_for);
+        const existing = byDay[key];
+        if (!existing || (!existing.confirmed_at && log.confirmed_at)) byDay[key] = log;
+      }
+      return { reminder: r, drugName: medNameById.get(r.medication_id) ?? "Medication", byDay };
+    });
 
 
   return (
@@ -393,6 +466,10 @@ function MedicationsPage() {
               We'll email you at each scheduled time asking if you've taken your dose — no need to log in
               to confirm, just click Yes in the email.
             </p>
+            <p className="text-sm text-muted-foreground">
+              We check every 5 minutes, so it may take up to 5 minutes after the scheduled time for the
+              email to arrive.
+            </p>
           </CardHeader>
           <CardContent>
             {activeMeds.length === 0 ? (
@@ -401,7 +478,11 @@ function MedicationsPage() {
               <div className="space-y-5">
                 {activeMeds.map((m) => {
                   const reminders = remindersByMed[m.id] ?? [];
-                  const draft = reminderDrafts[m.id] ?? { time: "", label: "" };
+                  const draft = reminderDrafts[m.id] ?? {
+                    time: "",
+                    label: "",
+                    recurrence: "daily" as Recurrence,
+                  };
                   return (
                     <div key={m.id} className="rounded-2xl border border-border p-4">
                       <div className="mb-3 flex items-center justify-between">
@@ -418,7 +499,12 @@ function MedicationsPage() {
                               className="flex items-center justify-between rounded-xl border border-border px-3 py-2"
                             >
                               <div>
-                                <p className="text-sm font-medium">{formatTimeOfDay(r.time_of_day)}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-medium">{formatTimeOfDay(r.time_of_day)}</p>
+                                  <Badge variant="secondary">
+                                    {r.recurrence === "once" ? "One-time" : "Daily"}
+                                  </Badge>
+                                </div>
                                 {r.label ? <p className="text-xs text-muted-foreground">{r.label}</p> : null}
                               </div>
                               <div className="flex items-center gap-2">
@@ -449,7 +535,12 @@ function MedicationsPage() {
                             toast.error("Pick a time for the reminder.");
                             return;
                           }
-                          addReminder.mutate({ medicationId: m.id, time: draft.time, label: draft.label });
+                          addReminder.mutate({
+                            medicationId: m.id,
+                            time: draft.time,
+                            label: draft.label,
+                            recurrence: draft.recurrence,
+                          });
                         }}
                       >
                         <div className="space-y-1.5 sm:w-40">
@@ -481,6 +572,23 @@ function MedicationsPage() {
                             }
                           />
                         </div>
+                        <div className="space-y-1.5 sm:w-36">
+                          <Label htmlFor={`rec-${m.id}`}>Repeats</Label>
+                          <select
+                            id={`rec-${m.id}`}
+                            value={draft.recurrence}
+                            onChange={(e) =>
+                              setReminderDrafts((prev) => ({
+                                ...prev,
+                                [m.id]: { ...draft, recurrence: e.target.value as Recurrence },
+                              }))
+                            }
+                            className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+                          >
+                            <option value="daily">Daily</option>
+                            <option value="once">One-time</option>
+                          </select>
+                        </div>
                         <Button
                           type="submit"
                           className="rounded-xl"
@@ -500,38 +608,59 @@ function MedicationsPage() {
         <Card className="rounded-2xl lg:col-span-2">
           <CardHeader>
             <CardTitle>This week's adherence</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Based on the reminder emails you've confirmed over the last 7 days.
+            </p>
           </CardHeader>
           <CardContent>
-            {activeMeds.length === 0 ? (
-              <EmptyState title="No active medications" hint="Add one to track your weekly doses." />
+            {logsQ.isLoading || remindersQ.isLoading ? (
+              <ListSkeleton />
+            ) : adherenceRows.length === 0 ? (
+              <EmptyState
+                title="No reminders scheduled yet"
+                hint="Add a reminder above and your confirmations will appear here."
+              />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-125 text-sm">
                   <thead>
                     <tr className="text-left text-muted-foreground">
-                      <th className="pb-2 font-medium">Medication</th>
-                      {DAYS.map((d) => (
-                        <th key={d} className="pb-2 text-center font-medium">
-                          {d}
+                      <th className="pb-2 font-medium">Dose</th>
+                      {days.map((d) => (
+                        <th key={d.key} className="pb-2 text-center font-medium">
+                          {d.label}
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {activeMeds.map((m) => (
-                      <tr key={m.id} className="border-t border-border">
-                        <td className="py-3 pr-3 font-medium">{m.drug_name}</td>
-                        {DAYS.map((d) => {
-                          const key = `${m.id}-${d}`;
+                    {adherenceRows.map((row) => (
+                      <tr key={row.reminder.id} className="border-t border-border">
+                        <td className="py-3 pr-3">
+                          <p className="font-medium">{row.drugName}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatTimeOfDay(row.reminder.time_of_day)}
+                            {row.reminder.label ? ` · ${row.reminder.label}` : ""}
+                          </p>
+                        </td>
+                        {days.map((d) => {
+                          const log = row.byDay[d.key];
+                          const taken = !!log?.confirmed_at;
                           return (
-                            <td key={d} className="py-3 text-center">
-                              <Checkbox
-                                checked={!!adherence[key]}
-                                aria-label={`${m.drug_name} ${d}`}
-                                onCheckedChange={(v) =>
-                                  setAdherence((prev) => ({ ...prev, [key]: v === true }))
-                                }
-                              />
+                            <td key={d.key} className="py-3 text-center">
+                              {!log ? (
+                                <span className="text-muted-foreground" aria-label="No dose scheduled">
+                                  ·
+                                </span>
+                              ) : taken ? (
+                                <span className="text-primary" aria-label="Taken">
+                                  ✓
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground" aria-label="Not yet confirmed">
+                                  ○
+                                </span>
+                              )}
                             </td>
                           );
                         })}
