@@ -2,7 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SUPABASE_URL } from "@/lib/supabase";
+// Routed through a Cloudflare Worker proxy instead of hitting Supabase's
+// domain directly -- some networks (e.g. university WiFi) filter/block
+// less-common backend domains like *.supabase.co while ordinary browsing
+// works fine. Cloudflare's own domain is essentially never blocked.
+const CONFIRM_PROXY_URL = "https://ai-health-proxy.gnkpkch.workers.dev";
 
 type ConfirmStatus = "confirmed" | "already_confirmed" | "invalid" | "expired" | "error";
 
@@ -47,7 +51,7 @@ function ConfirmMedicationPage() {
     }
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/functions/v1/confirm-medication-reminder?token=${encodeURIComponent(token)}`,
+        `${CONFIRM_PROXY_URL}/functions/v1/confirm-medication-reminder?token=${encodeURIComponent(token)}`,
       );
       const json = (await res.json()) as ConfirmResponse;
       setResult(json);
