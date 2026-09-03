@@ -49,18 +49,36 @@ function ConfirmMedicationPage() {
       setLoading(false);
       return;
     }
-    try {
+
+    // Cache-busting + no-store: email clients and in-app webviews happily replay a
+    // previously seen GET from cache, which shows "Logged!" while the server was
+    // never hit and confirmed_at stays null.
+    const call = async (base: string) => {
       const res = await fetch(
-        `${CONFIRM_PROXY_URL}/functions/v1/confirm-medication-reminder?token=${encodeURIComponent(token)}`,
+        `${base}/functions/v1/confirm-medication-reminder?token=${encodeURIComponent(token)}&_=${Date.now()}`,
+        { cache: "no-store", headers: { "Cache-Control": "no-cache", Pragma: "no-cache" } },
       );
-      const json = (await res.json()) as ConfirmResponse;
-      setResult(json);
-    } catch {
-      setResult({ status: "error", message: "We couldn't reach the server. Please try again." });
-    } finally {
-      setLoading(false);
+      return (await res.json()) as ConfirmResponse;
+    };
+
+    // Try the proxy first, then the Supabase domain directly, then one retry.
+    const bases = [CONFIRM_PROXY_URL, SUPABASE_URL, CONFIRM_PROXY_URL];
+    for (const base of bases) {
+      try {
+        const json = await call(base);
+        if (json && typeof json.status === "string") {
+          setResult(json);
+          setLoading(false);
+          return;
+        }
+      } catch {
+        /* try the next base */
+      }
     }
+    setResult({ status: "error", message: "We couldn't reach the server. Please try again." });
+    setLoading(false);
   }, [token]);
+
 
   useEffect(() => {
     void run();
