@@ -124,7 +124,7 @@ export function AppLayout({
       <div className="lg:pl-64">
         <header className="no-print sticky top-0 z-20 flex items-center justify-between border-b border-border bg-background/85 px-4 py-4 backdrop-blur lg:px-8">
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
+            <h1 className="font-display text-2xl font-medium tracking-tight">{title}</h1>
             {description ? (
               <p className="text-sm text-muted-foreground">{description}</p>
             ) : null}
