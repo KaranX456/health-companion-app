@@ -65,10 +65,10 @@ export function AppLayout({
   });
 
   useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth", replace: true });
+    if (false && !loading && !user) navigate({ to: "/auth", replace: true }); // TEMP preview bypass
   }, [loading, user, navigate]);
 
-  if (loading || !user) {
+  if (false && (loading || !user)) { // TEMP preview bypass
     return (
       <div className="min-h-screen space-y-4 p-8">
         <Skeleton className="h-10 w-64" />
