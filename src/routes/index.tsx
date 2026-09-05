@@ -66,17 +66,33 @@ function Dashboard() {
   }));
 
   const firstName = data?.patient?.full_name?.split(" ")[0] ?? "there";
+  const hour = new Date().getHours();
+  const daypart = hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening";
 
   return (
-    <AppLayout title={`Hello, ${isLoading ? "…" : firstName}`} description="Here's your health at a glance.">
+    <AppLayout title="Dashboard" description="Here's your health at a glance.">
       <div className="space-y-6">
+        {/* Hero greeting — the one moment of elevation on this screen */}
+        <section className="rounded-4xl bg-gradient-to-br from-primary via-primary to-clay px-6 py-10 text-primary-foreground shadow-[0_20px_50px_-20px_color-mix(in_oklab,var(--color-primary)_60%,transparent)] sm:px-10 sm:py-12">
+          <p className="text-sm font-medium uppercase tracking-widest text-primary-foreground/70">
+            {new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
+          </p>
+          <h2 className="font-display mt-2 text-4xl font-light italic tracking-tight sm:text-5xl">
+            Good {daypart},{" "}
+            <span className="font-medium not-italic">{isLoading ? "…" : firstName}</span>
+          </h2>
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-primary-foreground/80">
+            A quick look at how things are going — your medications, symptoms and mood, all in one calm place.
+          </p>
+        </section>
+
         <div className="grid gap-4 sm:grid-cols-3">
           {[
             { label: "Active medications", value: data?.activeMeds },
             { label: "Logged symptoms", value: data?.symptomCount },
             { label: "Prep questions", value: data?.prepCount },
           ].map((stat) => (
-            <Card key={stat.label} className="rounded-2xl">
+            <Card key={stat.label} className="rounded-xl shadow-none">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   {stat.label}
@@ -86,7 +102,7 @@ function Dashboard() {
                 {isLoading ? (
                   <Skeleton className="h-9 w-16" />
                 ) : (
-                  <p className="text-3xl font-semibold">{stat.value ?? 0}</p>
+                  <p className="font-display text-3xl font-medium">{stat.value ?? 0}</p>
                 )}
               </CardContent>
             </Card>
