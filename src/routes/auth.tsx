@@ -86,13 +86,15 @@ function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-accent/50 to-background px-4 py-10">
-      <Card className="w-full max-w-md rounded-3xl shadow-sm">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-accent/60 to-background px-4 py-10">
+      <Card className="w-full max-w-md rounded-3xl border-border shadow-none">
         <CardHeader className="items-center text-center">
-          <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+          <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-[0_10px_25px_-10px_color-mix(in_oklab,var(--color-primary)_70%,transparent)]">
             <HeartPulse className="size-6" />
           </div>
-          <CardTitle className="text-2xl">AI Health Companion</CardTitle>
+          <CardTitle className="font-display text-3xl font-medium tracking-tight">
+            AI Health Companion
+          </CardTitle>
           <CardDescription>
             {mode === "signin"
               ? "Sign in to your patient account"

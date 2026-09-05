@@ -109,9 +109,9 @@ function Dashboard() {
           ))}
         </div>
 
-        <Card className="rounded-2xl">
+        <Card className="rounded-2xl shadow-none">
           <CardHeader>
-            <CardTitle>Mood trend</CardTitle>
+            <CardTitle className="font-display text-xl font-medium">Mood trend</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
