@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmptyState, ListSkeleton } from "@/components/common";
 import { formatDate, today } from "@/lib/format";
+import { Section } from "@/components/Section";
 
 export const Route = createFileRoute("/symptoms")({
   ssr: false,
@@ -106,8 +107,8 @@ function SymptomsPage() {
         </TabsList>
 
         <TabsContent value="log" className="space-y-6">
-          <Card className="rounded-2xl">
-            <CardHeader>
+          <Card className="overflow-hidden rounded-2xl">
+            <CardHeader className="border-b border-border bg-muted/50">
               <CardTitle>Log a symptom</CardTitle>
             </CardHeader>
             <CardContent>
@@ -170,21 +171,17 @@ function SymptomsPage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl">
-            <CardHeader>
-              <CardTitle>Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <Section title="Timeline">
               {symptomsQ.isLoading ? (
                 <ListSkeleton />
               ) : (symptomsQ.data?.length ?? 0) === 0 ? (
                 <EmptyState title="No symptoms logged yet" hint="Your entries will appear here in order." />
               ) : (
-                <ol className="space-y-3">
+                <ol className="divide-y divide-border">
                   {symptomsQ.data!.map((s) => (
                     <li
                       key={s.id}
-                      className="rounded-2xl border border-border bg-card px-4 py-3"
+                      className="py-4 first:pt-0 last:pb-0"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <p className="font-medium">{s.description}</p>
@@ -198,8 +195,7 @@ function SymptomsPage() {
                   ))}
                 </ol>
               )}
-            </CardContent>
-          </Card>
+          </Section>
         </TabsContent>
 
         <TabsContent value="summary">
@@ -208,11 +204,8 @@ function SymptomsPage() {
               <Printer className="size-4" /> Print summary
             </Button>
           </div>
-          <Card className="print-area rounded-2xl">
-            <CardHeader>
-              <CardTitle>Pre-visit summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6 text-sm">
+          <Section title="Visit-ready overview" className="print-area">
+            <div className="space-y-6 text-sm">
               <section>
                 <h3 className="mb-2 font-semibold">Recent symptoms</h3>
                 {(symptomsQ.data?.length ?? 0) === 0 ? (
@@ -256,8 +249,8 @@ function SymptomsPage() {
                   </ul>
                 )}
               </section>
-            </CardContent>
-          </Card>
+            </div>
+          </Section>
         </TabsContent>
       </Tabs>
     </AppLayout>

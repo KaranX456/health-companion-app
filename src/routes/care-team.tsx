@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState, InfoBanner, ListSkeleton } from "@/components/common";
 import { formatDate } from "@/lib/format";
+import { Section } from "@/components/Section";
 
 export const Route = createFileRoute("/care-team")({
   ssr: false,
@@ -93,8 +94,8 @@ function CareTeamPage() {
             Ask your doctor for their provider ID. You can revoke access at any time — they lose
             access immediately.
           </InfoBanner>
-          <Card className="rounded-2xl">
-            <CardHeader>
+          <Card className="overflow-hidden rounded-2xl">
+            <CardHeader className="border-b border-border bg-muted/50">
               <CardTitle>Authorize a doctor</CardTitle>
             </CardHeader>
             <CardContent>
@@ -127,17 +128,13 @@ function CareTeamPage() {
           </Card>
         </div>
 
-        <Card className="rounded-2xl">
-          <CardHeader>
-            <CardTitle>Authorized doctors</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Section title="People with access">
             {q.isLoading ? (
               <ListSkeleton rows={2} />
             ) : (q.data?.length ?? 0) === 0 ? (
               <EmptyState title="No doctors linked" hint="Authorize a doctor to share your record." />
             ) : (
-              <ul className="space-y-3">
+              <ul className="grid gap-3">
                 {q.data!.map((link) => (
                   <li key={link.id} className="rounded-2xl border border-border px-4 py-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -165,8 +162,7 @@ function CareTeamPage() {
                 ))}
               </ul>
             )}
-          </CardContent>
-        </Card>
+        </Section>
       </div>
     </AppLayout>
   );

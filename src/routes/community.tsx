@@ -4,9 +4,9 @@ import { ExternalLink } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { supabase } from "@/lib/supabase";
 import type { CommunityContent } from "@/lib/supabase";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState, ListSkeleton } from "@/components/common";
+import { Section } from "@/components/Section";
 
 export const Route = createFileRoute("/community")({
   ssr: false,
@@ -39,22 +39,22 @@ function CommunityPage() {
 
   return (
     <AppLayout title="Community" description="Stories from people living with similar conditions.">
+      <Section title="Community experiences">
       {q.isLoading ? (
         <ListSkeleton rows={4} />
       ) : (q.data?.length ?? 0) === 0 ? (
         <EmptyState title="No stories yet" hint="Check back soon for community content." />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="divide-y divide-border">
           {q.data!.map((c) => (
-            <Card key={c.id} className="flex flex-col rounded-2xl">
-              <CardHeader className="pb-2">
-                <Badge variant="secondary" className="mb-2 w-fit">
+            <article key={c.id} className="grid gap-3 py-5 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+              <div className="space-y-2">
+                <Badge variant="secondary" className="w-fit">
                   Lived experience — not medical advice
                 </Badge>
-                <CardTitle className="text-base">{c.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-1 flex-col justify-between gap-4">
+                <h3 className="font-semibold">{c.title}</h3>
                 <p className="text-sm text-muted-foreground">{c.excerpt ?? "No excerpt provided."}</p>
+              </div>
                 {c.source_ref ? (
                   <a
                     href={c.source_ref}
@@ -65,11 +65,11 @@ function CommunityPage() {
                     Read the source <ExternalLink className="size-3.5" />
                   </a>
                 ) : null}
-              </CardContent>
-            </Card>
+            </article>
           ))}
         </div>
       )}
+      </Section>
     </AppLayout>
   );
 }
