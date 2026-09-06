@@ -114,8 +114,8 @@ function TriagePage() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="rounded-2xl">
-            <CardHeader>
+          <Card className="overflow-hidden rounded-2xl">
+            <CardHeader className="border-b border-border bg-muted/50">
               <CardTitle>New triage submission</CardTitle>
             </CardHeader>
             <CardContent>

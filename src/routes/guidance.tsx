@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState, InfoBanner, ListSkeleton } from "@/components/common";
 import { titleCase } from "@/lib/format";
+import { Section } from "@/components/Section";
 
 export const Route = createFileRoute("/guidance")({
   ssr: false,
@@ -65,6 +66,7 @@ function GuidancePage() {
             hint="Guidance appears here once your care team has reviewed your record."
           />
         ) : (
+          <Section title="Recommended next steps">
           <div className="grid gap-4 md:grid-cols-2">
             {q.data!.map((d) => (
               <Card key={d.id} className="rounded-2xl">
@@ -93,6 +95,7 @@ function GuidancePage() {
               </Card>
             ))}
           </div>
+          </Section>
         )}
       </div>
     </AppLayout>

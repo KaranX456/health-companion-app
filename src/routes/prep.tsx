@@ -7,10 +7,10 @@ import { AppLayout } from "@/components/AppLayout";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import type { PrepQuestion, Symptom } from "@/lib/supabase";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { EmptyState, ListSkeleton } from "@/components/common";
+import { Section } from "@/components/Section";
 
 export const Route = createFileRoute("/prep")({
   ssr: false,
@@ -84,16 +84,15 @@ function PrepPage() {
   return (
     <AppLayout title="Appointment prep" description="Questions worth asking at your next visit.">
       <div className="space-y-6">
-        <Button className="rounded-xl" onClick={() => generate.mutate()} disabled={generate.isPending}>
-          <Sparkles className="size-4" />
-          {generate.isPending ? "Generating…" : "Generate more questions"}
-        </Button>
-
-        <Card className="rounded-2xl">
-          <CardHeader>
-            <CardTitle>Your questions</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Section
+          title="Questions for your next visit"
+          action={
+            <Button className="rounded-xl" onClick={() => generate.mutate()} disabled={generate.isPending}>
+              <Sparkles className="size-4" />
+              {generate.isPending ? "Generating…" : "Generate questions"}
+            </Button>
+          }
+        >
             {q.isLoading ? (
               <ListSkeleton />
             ) : (q.data?.length ?? 0) === 0 ? (
@@ -102,9 +101,9 @@ function PrepPage() {
                 hint="Generate a couple based on your most recent symptom."
               />
             ) : (
-              <ul className="space-y-3">
+              <ul className="divide-y divide-border">
                 {q.data!.map((item) => (
-                  <li key={item.id} className="flex items-start gap-3 rounded-2xl border border-border px-4 py-3">
+                  <li key={item.id} className="flex items-start gap-3 py-4 first:pt-0 last:pb-0">
                     <Checkbox
                       id={item.id}
                       checked={!!done[item.id]}
@@ -120,8 +119,7 @@ function PrepPage() {
                 ))}
               </ul>
             )}
-          </CardContent>
-        </Card>
+        </Section>
       </div>
     </AppLayout>
   );

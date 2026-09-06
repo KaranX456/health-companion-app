@@ -9,6 +9,7 @@ import type { Patient, WellbeingCheckin } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common";
+import { Section } from "@/components/Section";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -93,11 +94,7 @@ function Dashboard() {
           ))}
         </div>
 
-        <Card className="rounded-2xl">
-          <CardHeader>
-            <CardTitle>Mood trend</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Section title="Mood trend">
             {isLoading ? (
               <Skeleton className="h-56 w-full" />
             ) : chartData.length === 0 ? (
@@ -124,17 +121,15 @@ function Dashboard() {
                 </ResponsiveContainer>
               </div>
             )}
-          </CardContent>
-        </Card>
+        </Section>
 
-        <div>
-          <h2 className="mb-3 text-sm font-semibold text-muted-foreground">Quick links</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <Section title="Quick links">
+          <div className="grid divide-y divide-border sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-3">
             {NAV.filter((n) => n.to !== "/").map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
-                className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-4 transition-colors hover:bg-accent/50"
+                className="flex items-center justify-between px-3 py-3 transition-colors hover:bg-accent/50 sm:rounded-lg"
               >
                 <span className="flex items-center gap-3 text-sm font-medium">
                   <item.icon className="size-4 text-primary" />
@@ -144,7 +139,7 @@ function Dashboard() {
               </Link>
             ))}
           </div>
-        </div>
+        </Section>
       </div>
     </AppLayout>
   );

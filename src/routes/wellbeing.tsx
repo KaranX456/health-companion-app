@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { EmptyState, ListSkeleton } from "@/components/common";
+import { Section } from "@/components/Section";
 
 export const Route = createFileRoute("/wellbeing")({
   ssr: false,
@@ -94,8 +95,8 @@ function WellbeingPage() {
   return (
     <AppLayout title="Wellbeing check-in" description="A minute a day helps you spot patterns.">
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="rounded-2xl">
-          <CardHeader>
+        <Card className="overflow-hidden rounded-2xl">
+          <CardHeader className="border-b border-border bg-muted/50">
             <CardTitle>How are you feeling today?</CardTitle>
           </CardHeader>
           <CardContent>
@@ -153,11 +154,7 @@ function WellbeingPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl">
-          <CardHeader>
-            <CardTitle>Your trend</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        <Section title="Mood over time" className="space-y-6">
             {q.isLoading ? (
               <ListSkeleton rows={2} />
             ) : chartData.length === 0 ? (
@@ -181,9 +178,9 @@ function WellbeingPage() {
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-                <ul className="space-y-2">
+                <ul className="divide-y divide-border">
                   {q.data!.slice(0, 8).map((c) => (
-                    <li key={c.id} className="rounded-xl border border-border px-3 py-2 text-sm">
+                    <li key={c.id} className="py-3 text-sm first:pt-0 last:pb-0">
                       <span className="font-medium">{c.mood_rating}/10</span>{" "}
                       <span className="text-muted-foreground">
                         · {new Date(c.created_at).toLocaleDateString()}
@@ -194,8 +191,7 @@ function WellbeingPage() {
                 </ul>
               </>
             )}
-          </CardContent>
-        </Card>
+        </Section>
       </div>
     </AppLayout>
   );
