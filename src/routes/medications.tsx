@@ -15,7 +15,9 @@ import { Badge } from "@/components/ui/badge";
 
 import { Switch } from "@/components/ui/switch";
 import { EmptyState, ListSkeleton } from "@/components/common";
+import { Section } from "@/components/Section";
 import { formatDate, today } from "@/lib/format";
+
 
 type Recurrence = "daily" | "once";
 
@@ -313,11 +315,12 @@ function MedicationsPage() {
   return (
     <AppLayout title="Medication companion" description="Keep your medication list accurate and current.">
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="rounded-2xl">
-          <CardHeader>
+        <Card className="overflow-hidden rounded-2xl">
+          <CardHeader className="border-b border-border bg-muted/50">
             <CardTitle>{editingId ? "Edit medication" : "Add a medication"}</CardTitle>
           </CardHeader>
           <CardContent>
+
             <form
               className="grid gap-4 sm:grid-cols-2"
               onSubmit={(e) => {
@@ -399,11 +402,7 @@ function MedicationsPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl">
-          <CardHeader>
-            <CardTitle>Your medications</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Section title="Your medications">
             {medsQ.isLoading ? (
               <ListSkeleton />
             ) : (medsQ.data?.length ?? 0) === 0 ? (
@@ -456,26 +455,25 @@ function MedicationsPage() {
                 ))}
               </ul>
             )}
-          </CardContent>
-        </Card>
+        </Section>
 
-        <Card className="rounded-2xl lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Medication reminders</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              We'll email you at each scheduled time asking if you've taken your dose — no need to log in
-              to confirm, just click Yes in the email.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              We check every 5 minutes, so it may take up to 5 minutes after the scheduled time for the
-              email to arrive.
-            </p>
-          </CardHeader>
-          <CardContent>
+
+        <Section title="Email reminders" className="lg:col-span-2">
+            <div className="-mt-2 space-y-1">
+              <p className="text-sm text-muted-foreground">
+                We'll email you at each scheduled time asking if you've taken your dose — no need to log in
+                to confirm, just click Yes in the email.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                We check every 5 minutes, so it may take up to 5 minutes after the scheduled time for the
+                email to arrive.
+              </p>
+            </div>
             {activeMeds.length === 0 ? (
               <EmptyState title="Add a medication above to set reminders" />
             ) : (
               <div className="space-y-5">
+
                 {activeMeds.map((m) => {
                   const reminders = remindersByMed[m.id] ?? [];
                   const draft = reminderDrafts[m.id] ?? {
@@ -484,7 +482,7 @@ function MedicationsPage() {
                     recurrence: "daily" as Recurrence,
                   };
                   return (
-                    <div key={m.id} className="rounded-2xl border border-border p-4">
+                    <div key={m.id} className="border-t border-border pt-5 first:border-0 first:pt-0">
                       <div className="mb-3 flex items-center justify-between">
                         <p className="font-medium">{m.drug_name}</p>
                         <span className="text-xs font-medium text-muted-foreground">Reminders</span>
@@ -496,8 +494,9 @@ function MedicationsPage() {
                           {reminders.map((r) => (
                             <li
                               key={r.id}
-                              className="flex items-center justify-between rounded-xl border border-border px-3 py-2"
+                              className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2"
                             >
+
                               <div>
                                 <div className="flex items-center gap-2">
                                   <p className="text-sm font-medium">{formatTimeOfDay(r.time_of_day)}</p>
@@ -602,127 +601,119 @@ function MedicationsPage() {
                 })}
               </div>
             )}
-          </CardContent>
-        </Card>
+        </Section>
 
-        <Card className="rounded-2xl lg:col-span-2">
-          <CardHeader>
-            <CardTitle>This week's adherence</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Based on the reminder emails you've confirmed over the last 7 days.
-            </p>
-          </CardHeader>
-          <CardContent>
-            {logsQ.isLoading || remindersQ.isLoading ? (
-              <ListSkeleton />
-            ) : adherenceRows.length === 0 ? (
-              <EmptyState
-                title="No reminders scheduled yet"
-                hint="Add a reminder above and your confirmations will appear here."
-              />
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-125 text-sm">
-                  <thead>
-                    <tr className="text-left text-muted-foreground">
-                      <th className="pb-2 font-medium">Dose</th>
-                      {days.map((d) => (
-                        <th key={d.key} className="pb-2 text-center font-medium">
-                          {d.label}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {adherenceRows.map((row) => (
-                      <tr key={row.reminder.id} className="border-t border-border">
-                        <td className="py-3 pr-3">
-                          <p className="font-medium">{row.drugName}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {formatTimeOfDay(row.reminder.time_of_day)}
-                            {row.reminder.label ? ` · ${row.reminder.label}` : ""}
-                          </p>
-                        </td>
-                        {days.map((d) => {
-                          const log = row.byDay[d.key];
-                          const taken = !!log?.confirmed_at;
-                          return (
-                            <td key={d.key} className="py-3 text-center">
-                              {!log ? (
-                                <span className="text-muted-foreground" aria-label="No dose scheduled">
-                                  ·
-                                </span>
-                              ) : taken ? (
-                                <span className="text-primary" aria-label="Taken">
-                                  ✓
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground" aria-label="Not yet confirmed">
-                                  ○
-                                </span>
-                              )}
-                            </td>
-                          );
-                        })}
-                      </tr>
+
+        <Section title="This week's adherence" className="lg:col-span-2">
+          <p className="-mt-2 text-sm text-muted-foreground">
+            Based on the reminder emails you've confirmed over the last 7 days.
+          </p>
+          {logsQ.isLoading || remindersQ.isLoading ? (
+            <ListSkeleton />
+          ) : adherenceRows.length === 0 ? (
+            <EmptyState
+              title="No reminders scheduled yet"
+              hint="Add a reminder above and your confirmations will appear here."
+            />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-125 text-sm">
+                <thead>
+                  <tr className="text-left text-muted-foreground">
+                    <th className="pb-2 font-medium">Dose</th>
+                    {days.map((d) => (
+                      <th key={d.key} className="pb-2 text-center font-medium">
+                        {d.label}
+                      </th>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Report a side effect</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form
-              className="grid gap-4 sm:grid-cols-2"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!sideEffectMed || sideEffect.trim().length < 3) {
-                  toast.error("Pick a medication and describe what you noticed.");
-                  return;
-                }
-                reportSideEffect.mutate();
-              }}
-            >
-              <div className="space-y-1.5">
-                <Label htmlFor="semed">Medication</Label>
-                <select
-                  id="semed"
-                  value={sideEffectMed}
-                  onChange={(e) => setSideEffectMed(e.target.value)}
-                  className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
-                >
-                  <option value="">Select…</option>
-                  {(medsQ.data ?? []).map((m) => (
-                    <option key={m.id} value={m.drug_name}>
-                      {m.drug_name}
-                    </option>
+                  </tr>
+                </thead>
+                <tbody>
+                  {adherenceRows.map((row) => (
+                    <tr key={row.reminder.id} className="border-t border-border">
+                      <td className="py-3 pr-3">
+                        <p className="font-medium">{row.drugName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatTimeOfDay(row.reminder.time_of_day)}
+                          {row.reminder.label ? ` · ${row.reminder.label}` : ""}
+                        </p>
+                      </td>
+                      {days.map((d) => {
+                        const log = row.byDay[d.key];
+                        const taken = !!log?.confirmed_at;
+                        return (
+                          <td key={d.key} className="py-3 text-center">
+                            {!log ? (
+                              <span className="text-muted-foreground" aria-label="No dose scheduled">
+                                ·
+                              </span>
+                            ) : taken ? (
+                              <span className="text-primary" aria-label="Taken">
+                                ✓
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground" aria-label="Not yet confirmed">
+                                ○
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
                   ))}
-                </select>
-              </div>
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="sedesc">What did you notice?</Label>
-                <Textarea
-                  id="sedesc"
-                  value={sideEffect}
-                  maxLength={1000}
-                  onChange={(e) => setSideEffect(e.target.value)}
-                  placeholder="Nausea about an hour after each dose"
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <Button type="submit" className="rounded-xl" disabled={reportSideEffect.isPending}>
-                  Report side effect
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Section>
+
+
+        <Section title="Report a side effect" className="lg:col-span-2">
+          <form
+            className="grid gap-4 sm:grid-cols-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!sideEffectMed || sideEffect.trim().length < 3) {
+                toast.error("Pick a medication and describe what you noticed.");
+                return;
+              }
+              reportSideEffect.mutate();
+            }}
+          >
+            <div className="space-y-1.5">
+              <Label htmlFor="semed">Medication</Label>
+              <select
+                id="semed"
+                value={sideEffectMed}
+                onChange={(e) => setSideEffectMed(e.target.value)}
+                className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+              >
+                <option value="">Select…</option>
+                {(medsQ.data ?? []).map((m) => (
+                  <option key={m.id} value={m.drug_name}>
+                    {m.drug_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="sedesc">What did you notice?</Label>
+              <Textarea
+                id="sedesc"
+                value={sideEffect}
+                maxLength={1000}
+                onChange={(e) => setSideEffect(e.target.value)}
+                placeholder="Nausea about an hour after each dose"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <Button type="submit" variant="outline" className="rounded-xl" disabled={reportSideEffect.isPending}>
+                Report side effect
+              </Button>
+            </div>
+          </form>
+        </Section>
+
       </div>
     </AppLayout>
   );
