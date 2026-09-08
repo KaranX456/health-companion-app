@@ -14,7 +14,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmptyState, ListSkeleton } from "@/components/common";
+import { Section } from "@/components/Section";
 import { formatDate, titleCase, today } from "@/lib/format";
+
 
 export const Route = createFileRoute("/profile")({
   ssr: false,
@@ -238,9 +240,10 @@ function ProfilePage() {
         </TabsList>
 
         <TabsContent value="history" className="grid gap-6 lg:grid-cols-2">
-          <Card className="rounded-2xl">
-            <CardHeader>
+          <Card className="overflow-hidden rounded-2xl">
+            <CardHeader className="border-b border-border bg-muted/50">
               <CardTitle>{histEditId ? "Edit condition" : "Add a condition"}</CardTitle>
+
             </CardHeader>
             <CardContent>
               <form
@@ -335,11 +338,8 @@ function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl">
-            <CardHeader>
-              <CardTitle>Your conditions</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <Section title="Recorded conditions">
+
               {historyQ.isLoading ? (
                 <ListSkeleton rows={2} />
               ) : (historyQ.data?.length ?? 0) === 0 ? (
@@ -392,14 +392,15 @@ function ProfilePage() {
                   ))}
                 </ul>
               )}
-            </CardContent>
-          </Card>
+          </Section>
+
         </TabsContent>
 
         <TabsContent value="allergies" className="grid gap-6 lg:grid-cols-2">
-          <Card className="rounded-2xl">
-            <CardHeader>
+          <Card className="overflow-hidden rounded-2xl">
+            <CardHeader className="border-b border-border bg-muted/50">
               <CardTitle>{allergyEditId ? "Edit allergy" : "Add an allergy"}</CardTitle>
+
             </CardHeader>
             <CardContent>
               <form
@@ -471,11 +472,8 @@ function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl">
-            <CardHeader>
-              <CardTitle>Your allergies</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <Section title="Known allergies">
+
               {allergyQ.isLoading ? (
                 <ListSkeleton rows={2} />
               ) : (allergyQ.data?.length ?? 0) === 0 ? (
@@ -526,14 +524,15 @@ function ProfilePage() {
                   ))}
                 </ul>
               )}
-            </CardContent>
-          </Card>
+          </Section>
+
         </TabsContent>
 
         <TabsContent value="labs" className="grid gap-6 lg:grid-cols-2">
-          <Card className="rounded-2xl">
-            <CardHeader>
+          <Card className="overflow-hidden rounded-2xl">
+            <CardHeader className="border-b border-border bg-muted/50">
               <CardTitle>{labEditId ? "Edit lab result" : "Add a lab result"}</CardTitle>
+
             </CardHeader>
             <CardContent>
               <form
@@ -627,11 +626,8 @@ function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl">
-            <CardHeader>
-              <CardTitle>Your lab results</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <Section title="Recorded results">
+
               {labQ.isLoading ? (
                 <ListSkeleton rows={2} />
               ) : (labQ.data?.length ?? 0) === 0 ? (
@@ -690,8 +686,8 @@ function ProfilePage() {
                   ))}
                 </ul>
               )}
-            </CardContent>
-          </Card>
+          </Section>
+
         </TabsContent>
       </Tabs>
     </AppLayout>
