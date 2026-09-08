@@ -459,23 +459,22 @@ function MedicationsPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Medication reminders</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              We'll email you at each scheduled time asking if you've taken your dose — no need to log in
-              to confirm, just click Yes in the email.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              We check every 5 minutes, so it may take up to 5 minutes after the scheduled time for the
-              email to arrive.
-            </p>
-          </CardHeader>
-          <CardContent>
+        <Section title="Email reminders" className="lg:col-span-2">
+            <div className="-mt-2 space-y-1">
+              <p className="text-sm text-muted-foreground">
+                We'll email you at each scheduled time asking if you've taken your dose — no need to log in
+                to confirm, just click Yes in the email.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                We check every 5 minutes, so it may take up to 5 minutes after the scheduled time for the
+                email to arrive.
+              </p>
+            </div>
             {activeMeds.length === 0 ? (
               <EmptyState title="Add a medication above to set reminders" />
             ) : (
               <div className="space-y-5">
+
                 {activeMeds.map((m) => {
                   const reminders = remindersByMed[m.id] ?? [];
                   const draft = reminderDrafts[m.id] ?? {
