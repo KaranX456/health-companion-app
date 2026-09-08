@@ -15,7 +15,9 @@ import { Badge } from "@/components/ui/badge";
 
 import { Switch } from "@/components/ui/switch";
 import { EmptyState, ListSkeleton } from "@/components/common";
+import { Section } from "@/components/Section";
 import { formatDate, today } from "@/lib/format";
+
 
 type Recurrence = "daily" | "once";
 
@@ -313,11 +315,12 @@ function MedicationsPage() {
   return (
     <AppLayout title="Medication companion" description="Keep your medication list accurate and current.">
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="rounded-2xl">
-          <CardHeader>
+        <Card className="overflow-hidden rounded-2xl">
+          <CardHeader className="border-b border-border bg-muted/50">
             <CardTitle>{editingId ? "Edit medication" : "Add a medication"}</CardTitle>
           </CardHeader>
           <CardContent>
+
             <form
               className="grid gap-4 sm:grid-cols-2"
               onSubmit={(e) => {
