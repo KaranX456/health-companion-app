@@ -605,124 +605,116 @@ function MedicationsPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl lg:col-span-2">
-          <CardHeader>
-            <CardTitle>This week's adherence</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Based on the reminder emails you've confirmed over the last 7 days.
-            </p>
-          </CardHeader>
-          <CardContent>
-            {logsQ.isLoading || remindersQ.isLoading ? (
-              <ListSkeleton />
-            ) : adherenceRows.length === 0 ? (
-              <EmptyState
-                title="No reminders scheduled yet"
-                hint="Add a reminder above and your confirmations will appear here."
-              />
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-125 text-sm">
-                  <thead>
-                    <tr className="text-left text-muted-foreground">
-                      <th className="pb-2 font-medium">Dose</th>
-                      {days.map((d) => (
-                        <th key={d.key} className="pb-2 text-center font-medium">
-                          {d.label}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {adherenceRows.map((row) => (
-                      <tr key={row.reminder.id} className="border-t border-border">
-                        <td className="py-3 pr-3">
-                          <p className="font-medium">{row.drugName}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {formatTimeOfDay(row.reminder.time_of_day)}
-                            {row.reminder.label ? ` · ${row.reminder.label}` : ""}
-                          </p>
-                        </td>
-                        {days.map((d) => {
-                          const log = row.byDay[d.key];
-                          const taken = !!log?.confirmed_at;
-                          return (
-                            <td key={d.key} className="py-3 text-center">
-                              {!log ? (
-                                <span className="text-muted-foreground" aria-label="No dose scheduled">
-                                  ·
-                                </span>
-                              ) : taken ? (
-                                <span className="text-primary" aria-label="Taken">
-                                  ✓
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground" aria-label="Not yet confirmed">
-                                  ○
-                                </span>
-                              )}
-                            </td>
-                          );
-                        })}
-                      </tr>
+        <Section title="This week's adherence" className="lg:col-span-2">
+          <p className="-mt-2 text-sm text-muted-foreground">
+            Based on the reminder emails you've confirmed over the last 7 days.
+          </p>
+          {logsQ.isLoading || remindersQ.isLoading ? (
+            <ListSkeleton />
+          ) : adherenceRows.length === 0 ? (
+            <EmptyState
+              title="No reminders scheduled yet"
+              hint="Add a reminder above and your confirmations will appear here."
+            />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-125 text-sm">
+                <thead>
+                  <tr className="text-left text-muted-foreground">
+                    <th className="pb-2 font-medium">Dose</th>
+                    {days.map((d) => (
+                      <th key={d.key} className="pb-2 text-center font-medium">
+                        {d.label}
+                      </th>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Report a side effect</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form
-              className="grid gap-4 sm:grid-cols-2"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!sideEffectMed || sideEffect.trim().length < 3) {
-                  toast.error("Pick a medication and describe what you noticed.");
-                  return;
-                }
-                reportSideEffect.mutate();
-              }}
-            >
-              <div className="space-y-1.5">
-                <Label htmlFor="semed">Medication</Label>
-                <select
-                  id="semed"
-                  value={sideEffectMed}
-                  onChange={(e) => setSideEffectMed(e.target.value)}
-                  className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
-                >
-                  <option value="">Select…</option>
-                  {(medsQ.data ?? []).map((m) => (
-                    <option key={m.id} value={m.drug_name}>
-                      {m.drug_name}
-                    </option>
+                  </tr>
+                </thead>
+                <tbody>
+                  {adherenceRows.map((row) => (
+                    <tr key={row.reminder.id} className="border-t border-border">
+                      <td className="py-3 pr-3">
+                        <p className="font-medium">{row.drugName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatTimeOfDay(row.reminder.time_of_day)}
+                          {row.reminder.label ? ` · ${row.reminder.label}` : ""}
+                        </p>
+                      </td>
+                      {days.map((d) => {
+                        const log = row.byDay[d.key];
+                        const taken = !!log?.confirmed_at;
+                        return (
+                          <td key={d.key} className="py-3 text-center">
+                            {!log ? (
+                              <span className="text-muted-foreground" aria-label="No dose scheduled">
+                                ·
+                              </span>
+                            ) : taken ? (
+                              <span className="text-primary" aria-label="Taken">
+                                ✓
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground" aria-label="Not yet confirmed">
+                                ○
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
                   ))}
-                </select>
-              </div>
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="sedesc">What did you notice?</Label>
-                <Textarea
-                  id="sedesc"
-                  value={sideEffect}
-                  maxLength={1000}
-                  onChange={(e) => setSideEffect(e.target.value)}
-                  placeholder="Nausea about an hour after each dose"
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <Button type="submit" className="rounded-xl" disabled={reportSideEffect.isPending}>
-                  Report side effect
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Section>
+
+
+        <Section title="Report a side effect" className="lg:col-span-2">
+          <form
+            className="grid gap-4 sm:grid-cols-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!sideEffectMed || sideEffect.trim().length < 3) {
+                toast.error("Pick a medication and describe what you noticed.");
+                return;
+              }
+              reportSideEffect.mutate();
+            }}
+          >
+            <div className="space-y-1.5">
+              <Label htmlFor="semed">Medication</Label>
+              <select
+                id="semed"
+                value={sideEffectMed}
+                onChange={(e) => setSideEffectMed(e.target.value)}
+                className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+              >
+                <option value="">Select…</option>
+                {(medsQ.data ?? []).map((m) => (
+                  <option key={m.id} value={m.drug_name}>
+                    {m.drug_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="sedesc">What did you notice?</Label>
+              <Textarea
+                id="sedesc"
+                value={sideEffect}
+                maxLength={1000}
+                onChange={(e) => setSideEffect(e.target.value)}
+                placeholder="Nausea about an hour after each dose"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <Button type="submit" variant="outline" className="rounded-xl" disabled={reportSideEffect.isPending}>
+                Report side effect
+              </Button>
+            </div>
+          </form>
+        </Section>
+
       </div>
     </AppLayout>
   );
