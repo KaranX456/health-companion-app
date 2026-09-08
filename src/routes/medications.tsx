@@ -484,7 +484,7 @@ function MedicationsPage() {
                     recurrence: "daily" as Recurrence,
                   };
                   return (
-                    <div key={m.id} className="rounded-2xl border border-border p-4">
+                    <div key={m.id} className="border-t border-border pt-5 first:border-0 first:pt-0">
                       <div className="mb-3 flex items-center justify-between">
                         <p className="font-medium">{m.drug_name}</p>
                         <span className="text-xs font-medium text-muted-foreground">Reminders</span>
@@ -496,8 +496,9 @@ function MedicationsPage() {
                           {reminders.map((r) => (
                             <li
                               key={r.id}
-                              className="flex items-center justify-between rounded-xl border border-border px-3 py-2"
+                              className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2"
                             >
+
                               <div>
                                 <div className="flex items-center gap-2">
                                   <p className="text-sm font-medium">{formatTimeOfDay(r.time_of_day)}</p>
@@ -602,8 +603,8 @@ function MedicationsPage() {
                 })}
               </div>
             )}
-          </CardContent>
-        </Card>
+        </Section>
+
 
         <Section title="This week's adherence" className="lg:col-span-2">
           <p className="-mt-2 text-sm text-muted-foreground">
