@@ -399,11 +399,7 @@ function MedicationsPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl">
-          <CardHeader>
-            <CardTitle>Your medications</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Section title="Your medications">
             {medsQ.isLoading ? (
               <ListSkeleton />
             ) : (medsQ.data?.length ?? 0) === 0 ? (
@@ -456,8 +452,8 @@ function MedicationsPage() {
                 ))}
               </ul>
             )}
-          </CardContent>
-        </Card>
+        </Section>
+
 
         <Section title="Email reminders" className="lg:col-span-2">
             <div className="-mt-2 space-y-1">
