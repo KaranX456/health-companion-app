@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { ExternalLink } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ExternalLink, Loader2, Search } from "lucide-react";
+import { toast } from "sonner";
 import { AppLayout } from "@/components/AppLayout";
 import { supabase } from "@/lib/supabase";
 import type { CommunityContent } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { EmptyState, ListSkeleton } from "@/components/common";
 import { Section } from "@/components/Section";
 
@@ -28,6 +32,9 @@ export const Route = createFileRoute("/community")({
 });
 
 function CommunityPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const queryClient = useQueryClient();
+
   const q = useQuery({
     queryKey: ["community"],
     queryFn: async () => {
@@ -37,9 +44,68 @@ function CommunityPage() {
     },
   });
 
+  const search = useMutation({
+    mutationFn: async (keyword: string) => {
+      const { data, error } = await supabase.functions.invoke("fetch-community-content", {
+        body: { keyword },
+      });
+      if (error) throw error;
+      return data as { inserted_count?: number } | null;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["community"] });
+      const inserted = data?.inserted_count ?? 0;
+      if (inserted > 0) {
+        toast.success(`Found ${inserted} new stories`);
+      } else {
+        toast.info("No new stories found for that search");
+      }
+    },
+    onError: () => {
+      toast.error("Couldn't search right now — try again in a moment.");
+    },
+  });
+
+  const submitSearch = () => {
+    const keyword = searchTerm.trim();
+    if (!keyword || search.isPending) return;
+    search.mutate(keyword);
+  };
+
   return (
     <AppLayout title="Community" description="Stories from people living with similar conditions.">
       <Section title="Community experiences">
+      <form
+        className="space-y-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          submitSearch();
+        }}
+      >
+        <div className="flex gap-2">
+          <Input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search a symptom, e.g. fatigue"
+            aria-label="Search community stories"
+          />
+          <Button type="submit" disabled={search.isPending || !searchTerm.trim()}>
+            {search.isPending ? (
+              <>
+                <Loader2 className="size-4 animate-spin" /> Searching...
+              </>
+            ) : (
+              <>
+                <Search className="size-4" /> Search
+              </>
+            )}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Searches real posts from health communities — always shown as personal experience, never
+          medical advice.
+        </p>
+      </form>
       {q.isLoading ? (
         <ListSkeleton rows={4} />
       ) : (q.data?.length ?? 0) === 0 ? (
