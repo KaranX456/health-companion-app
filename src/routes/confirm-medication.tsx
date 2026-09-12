@@ -77,7 +77,10 @@ function ConfirmMedicationPage() {
         /* try the next base */
       }
     }
-    setResult({ status: "error", message: "We couldn't reach the server. Please try again." });
+    setResult({
+      status: "error",
+      message: "We couldn't reach the server after a few tries — check your internet or WiFi connection, then try again.",
+    });
     setLoading(false);
   }, [token]);
 
