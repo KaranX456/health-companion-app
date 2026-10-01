@@ -56,11 +56,21 @@ function ConfirmMedicationPage() {
     // previously seen GET from cache, which shows "Logged!" while the server was
     // never hit and confirmed_at stays null.
     const call = async (base: string) => {
-      const res = await fetch(
-        `${base}/functions/v1/confirm-medication-reminder?token=${encodeURIComponent(token)}&_=${Date.now()}`,
-        { cache: "no-store", headers: { "Cache-Control": "no-cache", Pragma: "no-cache" } },
-      );
-      return (await res.json()) as ConfirmResponse;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      try {
+        const res = await fetch(
+          `${base}/functions/v1/confirm-medication-reminder?token=${encodeURIComponent(token)}&_=${Date.now()}`,
+          {
+            cache: "no-store",
+            headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+            signal: controller.signal,
+          },
+        );
+        return (await res.json()) as ConfirmResponse;
+      } finally {
+        clearTimeout(timeoutId);
+      }
     };
 
     // Try the proxy first, then the Supabase domain directly, then one retry.
